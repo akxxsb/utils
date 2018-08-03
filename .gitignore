@@ -1,3 +1,5 @@
+# mail conf
+*mail_conf.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
