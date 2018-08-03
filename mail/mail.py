@@ -88,7 +88,7 @@ class MailUtil(object):
         """
         text:待添加文本
         """
-        text = "<p>%s</p>" % text
+        text = "<pre>%s</pre>" % text
         self._body += text
 
     def add_html(self, htmlText):
@@ -185,5 +185,4 @@ if __name__ == '__main__':
     mail.add_text('test for add extra')
     mail.add_extra('mail.py')
 
-    mail.send(to_addr_list=[],
-            cc_addr_list=['akxxsb@vip.qq.com'], subject='测试邮件工具')
+    mail.send(to_addr_list=[],cc_addr_list=['akxxsb@vip.qq.com'], subject='测试邮件工具')
