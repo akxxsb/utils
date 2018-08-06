@@ -10,6 +10,17 @@ from email.MIMEImage import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.header import Header
 
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
+
+def set_logger(_logger):
+    """
+    _logger: 已经配置好的logging.Logger对象
+    配置本模块的logger,没配置打log不会做任何事, 非线程安全
+    """
+    global logger
+    logger = _logger
+
 class HtmlTable:
     """
     用于生成一个报表的html代码
@@ -80,6 +91,7 @@ class MailUtil(object):
         """
         清空添加的内容，重新添加的时候用
         """
+        logger.warning('reset mail content')
         self._image_count = 0
         self._body = ""
         self._msg = MIMEMultipart()
@@ -118,7 +130,7 @@ class MailUtil(object):
         self.add_html('<strong>{filename}</strong><center><img src="cid:{cid}"></center>'
                 .format(filename=basename, cid=cid))
         self._image_count += 1
-        logging.info('add image:%s, image count:%s' % (basename, self._image_count))
+        logger.info('add image:%s, image count:%s' % (basename, self._image_count))
 
     def add_extra(self, filename):
         """
@@ -132,7 +144,7 @@ class MailUtil(object):
         extra.add_header('Content-Disposition', 'attachment', filename=basename)
 
         self._msg.attach(extra)
-        logging.info('add extra:%s' % basename)
+        logger.info('add extra:%s' % basename)
 
     def get_html_text(self):
         """
@@ -158,11 +170,20 @@ class MailUtil(object):
         self._msg['Subject'] = subject
         smtp = smtplib.SMTP(self._host, self._port)
         smtp.starttls()
+        logger.info('login to %s:%s' % (self._host, self._port))
         smtp.login(self._user, self._passwd)
+        logger.info('send to: %r' % ','.join(to_addr_list + cc_addr_list))
         smtp.sendmail(self._user, to_addr_list + cc_addr_list, self._msg.as_string())
+        logger.info('send mail ok, quit smtp server')
         smtp.quit()
 
 if __name__ == '__main__':
+    # 配置logger
+    sys.path.append('..')
+    from qlogger import qlogger
+    _logger = qlogger.get_logger('mail_logger', 'mail.log')
+    set_logger(_logger)
+
     import mail_conf
     mail = MailUtil(user=mail_conf.user, passwd=mail_conf.passwd, host=mail_conf.host, port=mail_conf.port)
 
