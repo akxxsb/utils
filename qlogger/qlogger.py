@@ -32,8 +32,17 @@ def get_logger(logger_name, filename=None, level=logging.INFO, when='d',
 
     return logger
 
+_default_logger = None
+
+def get_default_logger():
+    global _default_logger
+    if _default_logger:
+        return _default_logger
+    _default_logger = get_logger(logger_name='default', filename='run.log')
+    return _default_logger
+
 def test():
-    logger = get_logger('test', 'test.log', level=logging.DEBUG)
+    logger = get_default_logger()
     logger.debug('test debug')
     logger.info('test info')
     logger.warn('test warn')

@@ -179,7 +179,7 @@ class MailUtil(object):
 
 if __name__ == '__main__':
     # 配置logger
-    sys.path.append('..')
+    #sys.path.append('..')
     from qlogger import qlogger
     _logger = qlogger.get_logger('mail_logger', 'mail.log')
     set_logger(_logger)
