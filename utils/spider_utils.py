@@ -13,13 +13,13 @@ def download_file(url, filename, chunk_size=1024):
             sys.stderr.write("error, code={code}, msg={msg}\n".format(code=rsp.status_code, msg=rsp.text))
             return
 
-        content_size = int(rsp.headers['Content-Length'])
+        content_size = int(rsp.headers.get('Content-Length', 0) or len(rsp.content))
         file_size = content_size / (1024 * 1024.0)
         sys.stderr.write("url: {url}\n".format(url=url))
-        sys.stderr.write("文件大小: {:.2f} Mb\n".format(file_size))
+        sys.stderr.write("文件大小: {:.3f} Mb\n".format(file_size))
 
         with open(filename, "wb") as f:
-            idx, offset, cur_bytes = 0, 0, 0
+            idx, offset, cur_bytes, speed = 0, 0, 0, 0
             st = time.time()
             for data in rsp.iter_content(chunk_size=chunk_size):
                 f.write(data)
@@ -27,13 +27,15 @@ def download_file(url, filename, chunk_size=1024):
                 offset += num
                 cur_bytes += num
 
-                if idx % 100 == 0:
+                if (offset == content_size) or (idx % 100 == 0):
                     cur_time = time.time()
                     et = cur_time
                     time_cost = et - st
 
                     # Mb/s
-                    speed = (cur_bytes/(1024.0 * 1024)) / max(time_cost, 0.0001)
+                    if offset != content_size:
+                        speed = (cur_bytes/(1024.0 * 1024)) / max(time_cost, 0.0001)
+
                     percent = int((offset + 0.0) / content_size * 100 + 0.5)
                     tag = "=" * percent
 
@@ -41,7 +43,7 @@ def download_file(url, filename, chunk_size=1024):
                     cur_size = offset / (1024.0 * 1024.0)
 
                     msg = ("\r[下载进度]: {tag} {percent}% {cur_time_cost:.2f}s" +
-                            " {cur_size:.2f}Mb {speed:.3f}Mb/s ").format(tag=tag, percent=percent, \
+                            " {cur_size:.3f}Mb {speed:.3f}Mb/s ").format(tag=tag, percent=percent, \
                             cur_time_cost=cur_time_cost, cur_size=cur_size, speed=speed)
                     sys.stderr.write(msg)
                     # 重置计数器
