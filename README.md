@@ -3,3 +3,4 @@
 
 * [mail](https://github.com/akxxsb/utils/tree/master/mail) python发送邮件工具
 * [qlogger](https://github.com/akxxsb/utils/tree/master/qlogger) python 日志工具，按天切分日志
+* [chat_room](https://github.com/akxxsb/utils/tree/master/chat_room) python 写的聊天室demo，基于socket,用select进行io复用
