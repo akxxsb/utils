@@ -67,6 +67,7 @@ def event_loop():
                 name = get_name(r)
                 if len(data) == 0:
                     fds.remove(r)
+                    r.close()
                     data = "[System message]: {} 离开了聊天".format(name)
                     print(data)
                     show_user_msg()
