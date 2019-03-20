@@ -30,7 +30,10 @@ def get_name(c):
 
 def send_board_cast(fds, no_send_list, msg):
     for fd in (fd for fd in fds if fd not in no_send_list):
-        fd.send(msg)
+        try:
+            fd.send(msg)
+        except socket.error as ex:
+            print(ex)
 
 def add_prefix_suffix(msg):
     prefix = "=" * 40
@@ -63,7 +66,11 @@ def event_loop():
                 show_user_msg()
                 send_board_cast(fds, [s, sys.stdin, c], data)
             else:
-                data = r.recv(BUFF_SIZE)
+                try:
+                    data = r.recv(BUFF_SIZE)
+                except socket.error as ex:
+                    print(ex)
+                    data = ""
                 name = get_name(r)
                 if len(data) == 0:
                     fds.remove(r)
